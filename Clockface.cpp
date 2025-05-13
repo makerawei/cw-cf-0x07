@@ -1,15 +1,14 @@
 
 #include "Clockface.h"
+#include <ArduinoJson.h>
 
 unsigned long lastMillis = 0;
 
 // TODO document size
 static DynamicJsonDocument doc(32768);
 
-Clockface::Clockface(Adafruit_GFX *display)
-{
-  _display = display;
-  Locator::provide(display);
+Clockface::Clockface(Adafruit_GFX* display) : IClockface(display) {
+
 }
 
 void Clockface::setup(CWDateTime *dateTime)
@@ -186,7 +185,7 @@ void Clockface::handleSpriteMovement(std::shared_ptr<CustomSprite>& sprite) {
     int8_t moveInitialY = doc["loop"][sprite->_spriteReference]["y"].as<int8_t>() ?: 0;
     int8_t moveTargetX = doc["loop"][sprite->_spriteReference]["moveTargetX"].as<int8_t>() ?: -1;
     int8_t moveTargetY = doc["loop"][sprite->_spriteReference]["moveTargetY"].as<int8_t>() ?: -1;
-    bool shouldReturnToOrigin = doc["loop"][sprite->_spriteReference]["shouldReturnToOrigin"].as<bool>() ?: false;
+    bool shouldReturnToOrigin = doc["loop"][sprite->_spriteReference]["shouldReturnToOrigin"].as<bool>() ? true : false;
 
     // Check if the sprite is moving
     if (sprite->isMoving()) {
@@ -314,7 +313,7 @@ bool Clockface::deserializeDefinition()
 
   if (server.startsWith("raw.")) {
     port = 443;
-    file = String("/jnthas/clock-club/main/shared" + file);
+    file = String("/robegamesios/clock-club/main/shared" + file);
   }
 
   ClockwiseHttpClient::getInstance()->httpGet(&client, server.c_str(), file.c_str(), port);
